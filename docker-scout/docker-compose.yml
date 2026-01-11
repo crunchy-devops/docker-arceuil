@@ -1,0 +1,19 @@
+volumes:
+  tomcat_data:
+
+networks:
+  tomcat_network:
+    driver: bridge
+
+services:
+  petclinic:
+    hostname: petclinic
+    container_name: petclinic
+    build: .
+    #command: tail -f /dev/null
+    ports:
+      - "8080:8080"
+    networks:
+      - tomcat_network
+    volumes:
+      - tomcat_data:/usr/local/tomcat/webapps
