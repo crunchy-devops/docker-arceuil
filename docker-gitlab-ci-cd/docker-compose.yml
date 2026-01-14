@@ -1,0 +1,21 @@
+networks:
+  prodnetwork:
+    driver: bridge
+
+services:
+  gitlab:
+    hostname: gitlab
+    container_name: gitlab
+    image: gitlab/gitlab-ce:latest
+    ports:
+      - "443:443"
+      - "31801:80"
+      - "32222:22"
+    networks:
+      - prodnetwork
+    environment:
+      - GITLAB_OMNIBUS_CONFIG="gitlab_rails['gitlab_shell_ssh_port'] = 32222"
+    volumes:
+      - /opt/gitlab/config:/etc/gitlab
+      - /opt/gitlab/logs:/var/log/gitlab
+      - /opt/gitlab/data:/var/opt/gitlab

@@ -1,0 +1,74 @@
+networks:
+  prodnetwork:
+    driver: bridge
+
+volumes:
+  postgresql_data:
+  sonarqube_data:
+
+services:
+  gitlab-ce:
+    hostname: gitlab-ce
+    container_name: gitlab-ce
+    image: gitlab/gitlab-ce:latest
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 2222
+    ports:
+      - "443:443"
+      - "31801:80"
+      - "2222:22"
+    volumes:
+      - /opt/gitlab/config:/etc/gitlab
+      - /opt/gitlab/logs:/var/log/gitlab
+      - /opt/gitlab/data:/var/opt/gitlab
+    networks:
+      - prodnetwork
+
+  sonar:
+    hostname: sonar
+    container_name: sonar
+    image: bitnamilegacy/sonarqube:25.8.0-debian-12-r2
+    ports:
+      - "32520:9000"
+      - "32521:8443"
+    networks:
+      - prodnetwork
+    volumes:
+      - sonarqube_data:/bitnami/sonarqube
+    depends_on:
+      - postgresql
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - SONARQUBE_DATABASE_USER=bn_sonarqube
+      - SONARQUBE_DATABASE_PASSWORD=bitnami
+      - SONARQUBE_DATABASE_NAME=bitnami_sonarqube
+
+  gitlab-runner:
+    hostname: gitlab-runner
+    container_name: gitlab-runner
+    image: gitlab/gitlab-runner:latest
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/gitlab-runner-config:/etc/gitlab-runner
+    depends_on:
+      - gitlab-ce
+    networks:
+      - prodnetwork
+
+  postgresql:
+    hostname: postgresql
+    container_name: postgresql
+    image: bitnamilegacy/postgresql:17.6.0-debian-12-r4
+    ports:
+      - "32431:5432"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_USERNAME=bn_sonarqube
+      - POSTGRESQL_PASSWORD=bitnami
+      - POSTGRESQL_DATABASE=bitnami_sonarqube
+    volumes:
+      - postgresql_data:/bitnami/postgresql
+    networks:
+      - prodnetwork
