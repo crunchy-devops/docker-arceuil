@@ -3,15 +3,21 @@
 sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 sudo dnf update
 sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker $USER
+sudo systemctl enable --now docker
 cd /home/alma/docker-arcueil
 sudo fdisk -l
-sudo mkfs.xfs /dev/sdc
+sudo mkfs.xfs /dev/sdb
 sudo mkdir -p /mnt/data/docker
+sudo mount /dev/sdb /mnt/data/docker
+sudo echo "/dev/sdb /mnt/data/docker xfs defaults 0 0" >> /etc/fstab 
+sudo chown -R root:root /mnt/data/docker
+sudo chmod 755 /mnt/data/docker
 ```
 
 ## bash completion
 ```shell
-sudo dnf install -y docker-bash-completion
+sudo dnf install -y bash-completion
 ```
 ### change .bashrc
 ```shell
@@ -22,7 +28,6 @@ if [ -f /etc/bash_completion.d/authselect-completion.sh ]; then
 fi
 EOT
 ```
-
 
 ## daemon.json   /etc/docker/daemon.json
 ```json
@@ -46,7 +51,38 @@ EOT
 }
 ```
 
-## SElinux
+Explications des options :
+
+data-root : Déplace les images/volumes sur un disque large.
+
+live-restore : Permet aux conteneurs de rester allumés si le démon Docker doit être mis à jour ou redémarré.
+
+log-opts : Indispensable. Empêche les logs de saturer le disque.
+
+no-new-privileges : Empêche les conteneurs d'élever leurs privilèges (sécurité).
+
+default-ulimits : Augmente les limites par défaut des conteneurs.
+check
+```shell
+cat /proc/$(ps -A | grep dockerd | awk '{print $1}')/limits | grep "files"
+```
+# restart docker
+```shell
+sudo systemctl restart docker
+```
+# check
+```shell
+docker info | grep "Docker Root Dir"
+```
+
+#  install portainer
+```shell
+docker volume create portainer_data
+docker run -d -p 32125:8000 -p 32126:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock \
+ -v portainer_data:/data portainer/portainer-ce:2.20.2-alpine
+```
+---
+## SElinux (optional)
 ```shell
 # Installation de l'utilitaire de gestion de contexte
 sudo dnf install -y policycoreutils-python-utils

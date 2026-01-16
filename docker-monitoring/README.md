@@ -1,3 +1,53 @@
+# docker-monitoring
+## Stress du CPU
+Commnande sans limite
+```shell
+docker run --name stress-machine systemdevformations/stress --cpu 4
+ckech with htop
+htop
+docker run --name stress-machine  --cpus="0.5" systemdevformations/stress --cpu 4
+```
+## install ctop
+```shell
+sudo dnf install ctop
+sudo wget https://github.com/bcicen/ctop/releases/download/v0.7.7/ctop-0.7.7-linux-amd64 -O /usr/local/bin/ctop
+sudo chmod +x /usr/local/bin/ctop
+ctop
+```
+
+## examples
+```shell
+cd stress/
+docker build -t systemdevformations/stress .
+docker push systemdevformations/stress:latest 
+docker run --name stress-machine systemdevformations/stress --cpu 4 
+docker run --name stress-machine  --cpus="0.5" systemdevformations/stress --cpu 4
+docker run --name stress-machine   systemdevformations/stress --vm 2 --vm-bytes 8G
+docker inspect stress-machine 
+# find oomkiller in inspect
+docker run --name stress-machine   systemdevformations/stress --vm 2 --vm-bytes 4G
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Lab-prometheus-reverse-proxy
 ## Launch 2 containers prometheus and node-exporter 
 

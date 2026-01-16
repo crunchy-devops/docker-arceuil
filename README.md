@@ -15,6 +15,8 @@ sudo dnf install -y git wget htop iotop iftop vim
 See docker-in-prod/README.md
 
 
+## Monitoring
+See docker-monitoring/README.md
 
 
 
