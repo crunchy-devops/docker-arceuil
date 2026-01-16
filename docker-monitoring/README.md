@@ -24,30 +24,14 @@ docker run --name stress-machine systemdevformations/stress --cpu 4
 docker run --name stress-machine  --cpus="0.5" systemdevformations/stress --cpu 4
 docker run --name stress-machine   systemdevformations/stress --vm 2 --vm-bytes 8G
 docker inspect stress-machine 
-# find oomkiller in inspect
+# find oomkilled in inspect
 docker run --name stress-machine   systemdevformations/stress --vm 2 --vm-bytes 4G
 
 ```
+En production, ne lancez jamais un conteneur sans --memory. Sans limite, un simple bug applicatif 
+(fuite de mémoire) peut geler tout votre serveur AlmaLinux et rendre le SSH inaccessible."
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+---
 # Lab-prometheus-reverse-proxy
 ## Launch 2 containers prometheus and node-exporter 
 
